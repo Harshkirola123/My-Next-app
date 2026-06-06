@@ -48,11 +48,8 @@ export default function LoginComponents() {
         throw new Error(result.message || "Login failed");
       }
 
-      localStorage.setItem("accessToken", result.accessToken);
-
       dispatch(
         setCredentials({
-          accessToken: result.accessToken,
           user: result.user,
         }),
       );

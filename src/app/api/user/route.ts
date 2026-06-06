@@ -2,15 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 const BACKEND_URL = process.env.BACKEND_URL!;
 
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    // Get refresh token cookie
-    const cookie = req.headers.get("cookie");
-
-    const backendResponse = await fetch(`${BACKEND_URL}/user/refresh-token`, {
-      method: "POST",
+    const authorization = req.headers.get("authorization");
+    const backendResponse = await fetch(`${BACKEND_URL}/user`, {
+      method: "get",
       headers: {
-        Cookie: cookie || "",
+        cookie: req.headers.get("cookie") || "",
+        Authorization: authorization || "",
       },
       credentials: "include",
     });
@@ -18,29 +17,21 @@ export async function POST(req: NextRequest) {
     const data = await backendResponse.json();
 
     if (!backendResponse.ok) {
-      const res = NextResponse.json(
+      return NextResponse.json(
         {
           success: false,
-          message: data.message || "Unauthorized",
+          message: data.message || "Login failed",
         },
         {
           status: backendResponse.status,
         },
       );
-      res.cookies.delete("refreshToken");
-      return res;
     }
 
     const response = NextResponse.json({
       success: true,
+      user: data.data.user,
     });
-
-    // Forward updated refresh cookie if backend rotates it
-    const setCookie = backendResponse.headers.get("set-cookie");
-
-    if (setCookie) {
-      response.headers.set("set-cookie", setCookie);
-    }
 
     return response;
   } catch (error) {

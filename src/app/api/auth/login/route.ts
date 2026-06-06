@@ -34,7 +34,6 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({
       success: true,
-      accessToken: data.data.accessToken,
       user: data.data.user,
     });
 
