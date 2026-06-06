@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     response.cookies.delete("refreshToken");
+    response.cookies.delete("accessToken");
 
     return response;
   } catch (error) {
